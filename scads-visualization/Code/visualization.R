@@ -57,9 +57,29 @@ getQueryData = normalizeTimestampsToMin(getAllEventsForGivenQuery(miniTraceData,
 getAllEventsForGivenQuery(miniTraceData, "getRangeQuery100000")
 
 
-getQueryData = getAllEventsForGivenQuery(miniTraceData, "getQuery100000")
+#getQueryData = getAllEventsForGivenQuery(miniTraceData, "getQuery100000")
 getQueryData = normalizeTimestampsToMin(getAllEventsForGivenQuery(miniTraceData, "getQuery100000"))
+pdf("~/Desktop/getQueryVisualization.pdf")
 plotAllEventsForGivenQuery(getQueryData)
+dev.off()
 
 getRangeQueryData = normalizeTimestampsToMin(getAllEventsForGivenQuery(miniTraceData, "getRangeQuery100000"))
+pdf("~/Desktop/getRangeQueryVisualization.pdf")
 plotAllEventsForGivenQuery(getRangeQueryData)
+dev.off()
+
+
+
+# look at plots for a few different queries of each type
+smallTraceDataFilename = "~/Desktop/radlab-demo/scads-visualization/Data/Processed/smallTraceDataWithElapsedTimes.csv"
+smallTraceData = as.data.frame(read.csv(smallTraceDataFilename))
+
+queryIds = smallTraceData$id[which(smallTraceData$type == "query")]
+getQueries = grep("getQuery", smallTraceData$id[which(smallTraceData$type == "query")])
+getRangeQueries = grep("getRangeQuery", smallTraceData$id[which(smallTraceData$type == "query")])
+
+for (i in 1:length(queryIds)) {
+	pdf(paste("~/Desktop/", queryIds[i], ".pdf", sep=""))
+	plotAllEventsForGivenQuery(normalizeTimestampsToMin(getAllEventsForGivenQuery(smallTraceData, queryIds[i])))
+	
+}
