@@ -28,7 +28,7 @@ getElapsedTime = function(traceData, operationType) {
 query1Data = miniTraceData[1:7,]
 max(query1Data$timestamp + query1Data$elapsedTime)
 
-plot(c(0,750000), c(0,100), col=0, xlab="Time (ns)", ylab="")
+plot(c(0,750000), c(0,100), col=0, xlab="Time (ns)", ylab="", main="Visualization of GET query")
 lines(c(query1Data$timestamp[query1Data$type == "query"], query1Data$elapsedTime[query1Data$type == "query"]), c(75, 75), lw=2, col="red")
 
 for (i in 1:6) {
@@ -38,3 +38,28 @@ for (i in 1:6) {
 		lines(c(query1Data$timestamp[i], query1Data$timestamp[i] + query1Data$elapsedTime[i]), c(25, 25), lw=2, col="purple")
 	}
 }
+
+legend("topright", legend=c("query", "iterator", "message"), col=c("red", "blue", "purple"), lw=2)
+
+# testing functions in visualization-functions.R
+setwd("~/Desktop/radlab-demo/scads-visualization/Code")
+source("visualization-functions.R")
+
+getQueryIndices(miniTraceData)
+
+getIndexOfGivenQuery(miniTraceData, "getQuery100000")
+getIndexOfGivenQuery(miniTraceData, "getRangeQuery100000")
+
+getIndexOfPreviousQuery(miniTraceData, "getQuery100000")
+getIndexOfPreviousQuery(miniTraceData, "getRangeQuery100000")
+
+getQueryData = normalizeTimestampsToMin(getAllEventsForGivenQuery(miniTraceData, "getQuery100000"))
+getAllEventsForGivenQuery(miniTraceData, "getRangeQuery100000")
+
+
+getQueryData = getAllEventsForGivenQuery(miniTraceData, "getQuery100000")
+getQueryData = normalizeTimestampsToMin(getAllEventsForGivenQuery(miniTraceData, "getQuery100000"))
+plotAllEventsForGivenQuery(getQueryData)
+
+getRangeQueryData = normalizeTimestampsToMin(getAllEventsForGivenQuery(miniTraceData, "getRangeQuery100000"))
+plotAllEventsForGivenQuery(getRangeQueryData)
