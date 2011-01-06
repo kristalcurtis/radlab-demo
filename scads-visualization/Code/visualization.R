@@ -81,5 +81,5 @@ getRangeQueries = grep("getRangeQuery", smallTraceData$id[which(smallTraceData$t
 for (i in 1:length(queryIds)) {
 	pdf(paste("~/Desktop/", queryIds[i], ".pdf", sep=""))
 	plotAllEventsForGivenQuery(normalizeTimestampsToMin(getAllEventsForGivenQuery(smallTraceData, queryIds[i])))
-	
+	dev.off()
 }
