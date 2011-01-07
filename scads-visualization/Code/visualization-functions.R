@@ -54,7 +54,7 @@ plotAllEventsForGivenQuery = function(queryData) {
 	# determine how many iterators there are => y positioning of query, messages, each iterator, legend
 	mapFromPlotElementToYCoord = getMapFromPlotElementToYCoord(queryData)
 
-	par(yaxt="n", mar=c(5,2,4,2))
+	par(yaxt="n", mar=c(5,15,4,2))
 	plot(c(xlimMin, xlimMax), c(0, mapFromPlotElementToYCoord[mapFromPlotElementToYCoord[,"plotElement"] == "top", "yCoord"]), col=0, xlab="Time (ms)", ylab="", main=paste("Visualization of", queryId, "query"))
 
 	messageCount = 0
@@ -76,8 +76,8 @@ plotAllEventsForGivenQuery = function(queryData) {
 		}
 	}
 
-	#legend("topright", legend=c("query", "iterator", "message"), col=c("red", "blue", "purple"), lw=2)
-	createLegendForPlotWithAllQueryEvents()
+	createLegendForPlotWithAllQueryEvents() 
+	labelIteratorsOnPlotWithAllQueryEvents(queryData)
 }
 
 getQueryIdFromQueryData = function(queryData) {
@@ -124,6 +124,13 @@ createLegendForPlotWithAllQueryEvents = function() {
 	
 	legend("topright", legend=c("query", mapFromIteratorFunctionsToColors[,"function"], mapFromMessagesToColors[,"messageType"]), col=c("red", mapFromIteratorFunctionsToColors[,"color"], mapFromMessagesToColors[,"color"]), lw=2)
 	
+}
+
+labelIteratorsOnPlotWithAllQueryEvents = function(queryData) {
+	uniqueIterators = getUniqueIterators(getIteratorEventIdsFromQueryData(queryData))
+	map = getMapFromPlotElementToYCoord(queryData)
+
+	mtext(uniqueIterators, side=2, at=map[which(map[,"plotElement"] %in% uniqueIterators),"yCoord"], line=1, las=1)
 }
 
 getIteratorNameAndPosition = function(iteratorId) {

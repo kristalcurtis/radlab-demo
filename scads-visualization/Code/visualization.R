@@ -116,3 +116,11 @@ plotAllEventsForGivenQuery(joinQueryData)
 getMapFromPlotElementToYCoord(joinQueryData)
 
 queryData = joinQueryData
+
+
+numberOfMessagesInQuery(joinQueryData)
+getMapFromPlotElementToYCoord(joinQueryData)
+
+# figure out how to label iterator lines
+uniqueIterators = getUniqueIterators(getIteratorEventIdsFromQueryData(joinQueryData))
+mtext(uniqueIterators, side=2)
