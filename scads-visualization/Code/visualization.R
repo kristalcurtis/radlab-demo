@@ -83,3 +83,35 @@ for (i in 1:length(queryIds)) {
 	plotAllEventsForGivenQuery(normalizeTimestampsToMin(getAllEventsForGivenQuery(smallTraceData, queryIds[i])))
 	dev.off()
 }
+
+
+# checking out the join query
+# requires using a separate line for each iterator
+
+smallTraceDataFilename = "/Users/ksauer/Desktop/radlab-demo/scads-visualization/Data/Processed/smallTraceDataWithElapsedTimesFromHugeTrace.csv"
+smallTraceData = as.data.frame(read.csv(smallTraceDataFilename))
+
+dim(smallTraceData)
+smallTraceData[1:10,]
+
+# figure out how many distinct iterators there are
+library(stringr)
+?str_split
+functionNameElements = str_split(smallTraceData[1,4], ":")
+functionNameElements[[1]][1]
+
+paste(functionNameElements[[1]][1], functionNameElements[[1]][2], sep=":")
+
+setwd("~/Desktop/radlab-demo/scads-visualization/Code")
+source("visualization-functions.R")
+
+getUniqueIterators(smallTraceData[which(smallTraceData[,"type"] == "iterator"),"id"])
+
+joinQueryData = normalizeTimestampsToMin(convertTimesFromNanosecondsToMilliseconds(getAllEventsForGivenQuery(smallTraceData, "joinQuery269399")))
+joinQueryData = getAllNormalizedEventsForGivenQuery(smallTraceData, "joinQuery269399")
+getUniqueIterators(joinQueryData[which(joinQueryData[,"type"] == "iterator"),"id"])
+getMapFromPlotElementToYCoord(joinQueryData)
+
+plotAllEventsForGivenQuery(joinQueryData)
+
+queryData = joinQueryData
