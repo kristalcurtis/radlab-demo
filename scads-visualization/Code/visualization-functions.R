@@ -57,19 +57,19 @@ plotAllEventsForGivenQuery = function(queryData) {
 	par(yaxt="n", mar=c(5,2,4,2))
 	plot(c(xlimMin, xlimMax), c(0, mapFromPlotElementToYCoord[mapFromPlotElementToYCoord[,"plotElement"] == "top", "yCoord"]), col=0, xlab="Time (ms)", ylab="", main=paste("Visualization of", queryId, "query"))
 
-	colorVectorForIteratorEvents = getColorVectorForIteratorEvents(queryData)
-
 	for (i in 1:nrow(queryData)) {
 		if (queryData$type[i] == "query") {
 			yCoord = mapFromPlotElementToYCoord[mapFromPlotElementToYCoord[,"plotElement"] == "query", "yCoord"]
 			lines(getEventStartAndEndTimes(queryData[i,]), c(yCoord, yCoord), lw=2, col="red")
 		} else if (queryData$type[i] == "iterator") {
+			color = getColorForIteratorEventType(queryData$id[i])
 			iteratorNameAndPosition = getIteratorNameAndPosition(queryData[i,"id"])
 			yCoord = mapFromPlotElementToYCoord[mapFromPlotElementToYCoord[,"plotElement"] == iteratorNameAndPosition, "yCoord"]
-			lines(getEventStartAndEndTimes(queryData[i,]), c(yCoord, yCoord), lw=2, col=colorVectorForIteratorEvents[i])
+			lines(getEventStartAndEndTimes(queryData[i,]), c(yCoord, yCoord), lw=2, col=color)
 		} else if (queryData$type[i] == "message") {
+			color = getColorForMessageType(queryData$id[i])
 			yCoord = mapFromPlotElementToYCoord[mapFromPlotElementToYCoord[,"plotElement"] == "message", "yCoord"]
-			lines(getEventStartAndEndTimes(queryData[i,]), c(yCoord, yCoord), lw=2, col="purple")
+			lines(getEventStartAndEndTimes(queryData[i,]), c(yCoord, yCoord), lw=2, col=color)
 		}
 	}
 
@@ -85,25 +85,22 @@ getEventStartAndEndTimes = function(event) {
 	return(c(event$timestamp, event$timestamp + event$elapsedTime))
 }
 
-getColorVectorForIteratorEvents = function(queryData) {
-	colorVectorForIteratorEvents = vector(length=nrow(queryData))
+getColorForIteratorEventType = function(iteratorId) {
 	colorMap = getMapFromIteratorFunctionsToColors()
 	
-	for (i in 1:nrow(queryData)) {
-		if (queryData$type[i] == "iterator") {
-			if (length(grep("open", queryData$id[i])) == 1) {
-				colorVectorForIteratorEvents[i] = colorMap[1,2]
-			} else if (length(grep("hasNext", queryData$id[i])) == 1) {
-				colorVectorForIteratorEvents[i] = colorMap[2,2]
-			} else if (length(grep("next", queryData$id[i])) == 1) {
-				colorVectorForIteratorEvents[i] = colorMap[3,2]
-			} else if (length(grep("close", queryData$id[i])) == 1) {
-				colorVectorForIteratorEvents[i] = colorMap[4,2]
-			}
-		}
+	if (length(grep("open", iteratorId)) == 1) {
+		color = colorMap[1,2]
+	} else if (length(grep("hasNext", iteratorId)) == 1) {
+		color = colorMap[2,2]
+	} else if (length(grep("next", iteratorId)) == 1) {
+		color = colorMap[3,2]
+	} else if (length(grep("close", iteratorId)) == 1) {
+		color = colorMap[4,2]
+	} else {
+		color = "black"
 	}
 	
-	return(colorVectorForIteratorEvents)
+	return(color)
 }
 
 getMapFromIteratorFunctionsToColors = function() {
@@ -120,8 +117,9 @@ getMapFromIteratorFunctionsToColors = function() {
 
 createLegendForPlotWithAllQueryEvents = function() {
 	mapFromIteratorFunctionsToColors = getMapFromIteratorFunctionsToColors()
+	mapFromMessagesToColors = getMapFromMessagesToColors()
 	
-	legend("topright", legend=c("query", mapFromIteratorFunctionsToColors[,"function"], "message"), col=c("red", mapFromIteratorFunctionsToColors[,"color"], "purple"), lw=2)
+	legend("topright", legend=c("query", mapFromIteratorFunctionsToColors[,"function"], mapFromMessagesToColors[,"messageType"]), col=c("red", mapFromIteratorFunctionsToColors[,"color"], mapFromMessagesToColors[,"color"]), lw=2)
 	
 }
 
@@ -171,4 +169,26 @@ getMapFromPlotElementToYCoord = function(queryData) {
 	return(map)
 }
 
+getMapFromMessagesToColors = function() {
+	map = matrix(nrow=2, ncol=2)
+	colnames(map) = c("messageType", "color")
+	
+	map[1,] = c("Get", "purple")
+	map[2,] = c("GetRange", "orange")
+	
+	return(map)
+}
 
+getColorForMessageType = function(messageId) {
+	map = getMapFromMessagesToColors()
+	
+	if (length(grep("Get:", messageId)) == 1) {
+		color = map[1,"color"]
+	} else if (length(grep("GetRange", messageId)) == 1) {
+		color = map[2,"color"]
+	} else {
+		color = "yellow"
+	}
+	
+	return(color)
+}

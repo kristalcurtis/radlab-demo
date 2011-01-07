@@ -113,5 +113,6 @@ getUniqueIterators(joinQueryData[which(joinQueryData[,"type"] == "iterator"),"id
 getMapFromPlotElementToYCoord(joinQueryData)
 
 plotAllEventsForGivenQuery(joinQueryData)
+getMapFromPlotElementToYCoord(joinQueryData)
 
 queryData = joinQueryData
