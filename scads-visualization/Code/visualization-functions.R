@@ -57,6 +57,8 @@ plotAllEventsForGivenQuery = function(queryData) {
 	par(yaxt="n", mar=c(5,2,4,2))
 	plot(c(xlimMin, xlimMax), c(0, mapFromPlotElementToYCoord[mapFromPlotElementToYCoord[,"plotElement"] == "top", "yCoord"]), col=0, xlab="Time (ms)", ylab="", main=paste("Visualization of", queryId, "query"))
 
+	messageCount = 0
+
 	for (i in 1:nrow(queryData)) {
 		if (queryData$type[i] == "query") {
 			yCoord = mapFromPlotElementToYCoord[mapFromPlotElementToYCoord[,"plotElement"] == "query", "yCoord"]
@@ -67,8 +69,9 @@ plotAllEventsForGivenQuery = function(queryData) {
 			yCoord = mapFromPlotElementToYCoord[mapFromPlotElementToYCoord[,"plotElement"] == iteratorNameAndPosition, "yCoord"]
 			lines(getEventStartAndEndTimes(queryData[i,]), c(yCoord, yCoord), lw=2, col=color)
 		} else if (queryData$type[i] == "message") {
+			messageCount = messageCount + 1
 			color = getColorForMessageType(queryData$id[i])
-			yCoord = mapFromPlotElementToYCoord[mapFromPlotElementToYCoord[,"plotElement"] == "message", "yCoord"]
+			yCoord = as.numeric(mapFromPlotElementToYCoord[mapFromPlotElementToYCoord[,"plotElement"] == "message", "yCoord"]) + messageCount * getMessageOffset()
 			lines(getEventStartAndEndTimes(queryData[i,]), c(yCoord, yCoord), lw=2, col=color)
 		}
 	}
@@ -152,21 +155,29 @@ getMapFromPlotElementToYCoord = function(queryData) {
 	
 	increment = 25
 	map[1,] = c("message", increment)
+	yCoordForLastMessage = increment + getMessageOffset() * numberOfMessagesInQuery(queryData)
 
 	for (i in 1:numUniqueIterators) {
 		map[i+1,"plotElement"] = uniqueIterators[i]
-		map[i+1,"yCoord"] = increment*(i+1)
+		map[i+1,"yCoord"] = yCoordForLastMessage + i*increment
 	}
+	yCoordForLastIterator = yCoordForLastMessage + numUniqueIterators*increment
 	
 	queryIndex = numUniqueIterators + 2
+	yCoordForQuery = yCoordForLastIterator + increment
 	map[queryIndex,"plotElement"] = "query"
-	map[queryIndex,"yCoord"] = increment*queryIndex
+	map[queryIndex,"yCoord"] = yCoordForQuery
 	
 	topIndex = queryIndex + 1
 	map[topIndex,"plotElement"] = "top"
-	map[topIndex,"yCoord"] = increment*(topIndex+1)
+	map[topIndex,"yCoord"] = yCoordForQuery + 3*increment
 	
 	return(map)
+}
+
+# number of pixels in graph by which messages should be offset
+getMessageOffset = function() {
+	return(3)
 }
 
 getMapFromMessagesToColors = function() {
@@ -191,4 +202,8 @@ getColorForMessageType = function(messageId) {
 	}
 	
 	return(color)
+}
+
+numberOfMessagesInQuery = function(queryData) {
+	return(length(which(queryData$type == "message")))
 }
