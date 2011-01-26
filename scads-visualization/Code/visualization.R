@@ -123,4 +123,48 @@ getMapFromPlotElementToYCoord(joinQueryData)
 
 # figure out how to label iterator lines
 uniqueIterators = getUniqueIterators(getIteratorEventIdsFromQueryData(joinQueryData))
-mtext(uniqueIterators, side=2)
+map = getMapFromPlotElementToYCoord(joinQueryData)
+mtext(uniqueIterators, side=2, at=c(86, 111), line=1, las=1)
+
+pdf("~/Desktop/joinQuery.pdf", width=20, height=10)
+plotAllEventsForGivenQuery(joinQueryData)
+dev.off()
+labelIteratorsOnPlotWithAllQueryEvents(joinQueryData)
+
+# make sure it still works for getQuery, getRangeQuery
+getQueryData = getAllNormalizedEventsForGivenQuery(smallTraceData, "getQuery269400")
+getRangeQueryData = getAllNormalizedEventsForGivenQuery(smallTraceData, "getRangeQuery269400")
+
+
+pdf("~/Desktop/getQuery.pdf", width=20, height=10)
+plotAllEventsForGivenQuery(getQueryData)
+dev.off()
+
+pdf("~/Desktop/getRangeQuery.pdf", width=20, height=10)
+plotAllEventsForGivenQuery(getRangeQueryData)
+dev.off()
+
+## seeing if 2nd get range is gone
+tracePath = "/Users/ksauer/Desktop/piqltraceWithElapsedTimes.csv"
+newTraceData = as.data.frame(read.csv(tracePath))
+
+setwd("~/Desktop/radlab-demo/scads-visualization/Code")
+source("visualization-functions.R")
+
+getRangeQueryData = getAllNormalizedEventsForGivenQuery(newTraceData, "getRangeQuery8")
+
+pdf("~/Desktop/getRangeQuery2.pdf", width=20, height=10)
+plotAllEventsForGivenQuery(getRangeQueryData)
+dev.off()
+
+# checking out merge sort join query
+tracePath = "/Users/ksauer/Desktop/piqltraceWithElapsedTimes2.csv"
+newTraceData = as.data.frame(read.csv(tracePath))
+
+mergeSortJoinQueryData = getAllNormalizedEventsForGivenQuery(newTraceData, "mergeSortJoinQuery4")
+
+pdf("~/Desktop/mergeSortJoinQuery2.pdf", width=20, height=10)
+plotAllEventsForGivenQuery(mergeSortJoinQueryData)
+dev.off()
+
+
