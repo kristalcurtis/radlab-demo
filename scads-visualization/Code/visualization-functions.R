@@ -22,7 +22,7 @@ getAllEventsForGivenQuery = function(traceData, queryId) {
 }
 
 getAllNormalizedEventsForGivenQuery = function(traceData, queryId) {
-	return(normalizeTimestampsToMin(convertTimesFromNanosecondsToMilliseconds(getAllEventsForGivenQuery(smallTraceData, queryId))))
+	return(normalizeTimestampsToMin(convertTimesFromNanosecondsToMilliseconds(getAllEventsForGivenQuery(traceData, queryId))))
 }
 
 getQueryIndices = function(traceData) {
