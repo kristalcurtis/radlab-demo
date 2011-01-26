@@ -54,7 +54,7 @@ plotAllEventsForGivenQuery = function(queryData) {
 	# determine how many iterators there are => y positioning of query, messages, each iterator, legend
 	mapFromPlotElementToYCoord = getMapFromPlotElementToYCoord(queryData)
 
-	par(yaxt="n", mar=c(5,15,4,2))
+	par(yaxt="n", mar=c(5,17,4,2))
 	plot(c(xlimMin, xlimMax), c(0, mapFromPlotElementToYCoord[mapFromPlotElementToYCoord[,"plotElement"] == "top", "yCoord"]), col=0, xlab="Time (ms)", ylab="", main=paste("Visualization of", queryId, "query"))
 
 	messageCount = 0
