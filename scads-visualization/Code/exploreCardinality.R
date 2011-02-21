@@ -86,3 +86,38 @@ queryDataInMs = convertTimesFromNanosecondsToMilliseconds(queryData)
 pdf(paste(queryFilename, ".pdf", sep=""))
 visualizeLatencyQuantilesVsCardinality(queryDataInMs)
 dev.off()
+
+
+# 2.11.10
+# look at myThoughts query data
+
+queryFilename="/Users/ksauer/Desktop/myThoughtsData.csv"
+
+setwd("/Users/ksauer/Desktop/radlab-demo/scads-visualization/Code")
+source("visualization-functions.R")
+source("exploreCardinalityFunctions.R")
+
+queryData = as.data.frame(read.csv(queryFilename))
+queryDataInMs = convertTimesFromNanosecondsToMilliseconds(queryData)
+
+visualizeLatencyQuantilesVsCardinality(queryDataInMs, "myThoughts")
+
+dim(queryData)
+colnames(queryData)
+queryData[1:10,]
+
+
+# look at myThoughts message data (trace)
+traceFilename="/Users/ksauer/Desktop/myThoughtsDataWithAllMessages.csv"
+
+setwd("/Users/ksauer/Desktop/radlab-demo/scads-visualization/Code")
+source("visualization-functions.R")
+source("exploreCardinalityFunctions.R")
+
+traceData = as.data.frame(read.csv(traceFilename))
+dim(traceData)
+
+queryData = getAllNormalizedEventsForGivenQuery(traceData, "myThoughts1")
+
+plotAllEventsForGivenQuery(queryData)
+
