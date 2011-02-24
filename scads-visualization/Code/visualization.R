@@ -168,3 +168,27 @@ plotAllEventsForGivenQuery(mergeSortJoinQueryData)
 dev.off()
 
 
+# look at thoughtstream query
+setwd("~/workspace/radlab-demo/scads-visualization/Code")
+source("visualization-functions.R")
+
+tracePath = "/Users/kcurtis/Desktop/thoughtstreamQueryDataTrace1.csv"
+traceData = getAllNormalizedEventsForGivenQuery(as.data.frame(read.csv(tracePath)), "thoughtstream1-100-10")
+dim(traceData)
+
+plotAllEventsForGivenQuery(traceData)
+
+numberOfMessagesInQuery(traceData)
+
+
+# look at debugged thoughtstream query
+setwd("~/workspace/radlab-demo/scads-visualization/Code")
+source("visualization-functions.R")
+
+tracePath = "/Users/kcurtis/Desktop/thoughtstreamQueryDataTrace.csv"
+traceData = getAllNormalizedEventsForGivenQuery(as.data.frame(read.csv(tracePath)), "thoughtstream1-100-10")
+dim(traceData)
+
+plotAllEventsForGivenQuery(traceData)
+
+numberOfMessagesInQuery(traceData)

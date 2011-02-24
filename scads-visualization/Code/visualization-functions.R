@@ -177,7 +177,7 @@ getMapFromPlotElementToYCoord = function(queryData) {
 	
 	topIndex = queryIndex + 1
 	map[topIndex,"plotElement"] = "top"
-	map[topIndex,"yCoord"] = yCoordForQuery + 3*increment
+	map[topIndex,"yCoord"] = yCoordForQuery + 6*increment
 	
 	return(map)
 }
