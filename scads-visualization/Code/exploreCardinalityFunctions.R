@@ -87,3 +87,24 @@ getSingleDataset = function(basePath) {
 	
 	return(data)
 }
+
+# for printing latency cdfs, one per server
+getLatencyCdfPerServer = function(basePath, queryType) {
+	setwd(basePath)
+	files = list.files(basePath)
+	numFiles = length(files)
+	colors = rainbow(numFiles)
+
+	allQueryData = convertTimesFromNanosecondsToMilliseconds(getSingleDataset(basePath))
+
+	cdf = ecdf(allQueryData$elapsedTime)
+	cdfSeq = seq(min(allQueryData$elapsedTime), quantile(allQueryData$elapsedTime, 0.999))
+	plot(cdfSeq, cdf(cdfSeq), col=0, xlab="Latency (ms)", ylab="Quantile", main="thoughtstream")
+
+	for (i in 1:numFiles) {
+		print(i)
+		miniQueryData = convertTimesFromNanosecondsToMilliseconds(as.data.frame(read.csv(files[i])))
+		cdf = ecdf(miniQueryData$elapsedTime)
+		lines(cdfSeq, cdf(cdfSeq), col=colors[i], lw=2)
+	}
+}
