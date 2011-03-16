@@ -357,6 +357,72 @@ getLatencySensitivityAnalysisMatrix(thoughtstreamQueryDataNio, 0.99)
 getLatencySensitivityAnalysisMatrix(localUserThoughtstreamQueryDataNio, 0.99)
 
 
-# 2.23.11
-# looking at localUserThoughtstream results from 10 trace collectors
+# 3.14.11
+# looking at thoughtstream, localUserThoughtstream results from distributed setting
 
+setwd("/Users/kcurtis/workspace/radlab-demo/scads-visualization/Code")
+source("visualization-functions.R")
+source("exploreCardinalityFunctions.R")
+
+thoughtstreamFilename = "/Users/kcurtis/Desktop/thoughtstream1.csv"
+localUserThoughtstreamFilename = "/Users/kcurtis/Desktop/localUserThoughtstream.csv"
+
+thoughtstreamQueryData = convertTimesFromNanosecondsToMilliseconds(as.data.frame(read.csv(thoughtstreamFilename)))
+localUserThoughtstreamQueryData = convertTimesFromNanosecondsToMilliseconds(as.data.frame(read.csv(localUserThoughtstreamFilename)))
+
+dim(thoughtstreamQueryData)
+dim(localUserThoughtstreamQueryData)
+
+par(mfrow=c(1,2))
+plotThoughtstreamSensitivityAnalysis(thoughtstreamQueryData, 0.5, "thoughtstream")
+plotThoughtstreamSensitivityAnalysis(localUserThoughtstreamQueryData, 0.5, "localUserThoughtstream")
+
+plotThoughtstreamSensitivityAnalysis(thoughtstreamQueryData, 0.9, "thoughtstream")
+plotThoughtstreamSensitivityAnalysis(localUserThoughtstreamQueryData, 0.9, "localUserThoughtstream")
+
+plotThoughtstreamSensitivityAnalysis(thoughtstreamQueryData, 0.99, "thoughtstream")
+plotThoughtstreamSensitivityAnalysis(localUserThoughtstreamQueryData, 0.99, "localUserThoughtstream")
+
+
+# 3.16.11
+# looking at thoughtstream, localUserThoughtstream merged results from distributed setting
+setwd("/Users/kcurtis/workspace/radlab-demo/scads-visualization/Code")
+source("visualization-functions.R")
+source("exploreCardinalityFunctions.R")
+
+thoughtstreamData = convertTimesFromNanosecondsToMilliseconds(getSingleDataset("~/Desktop/thoughtstream"))
+localUserThoughtstreamData = convertTimesFromNanosecondsToMilliseconds(getSingleDataset("~/Desktop/localUserThoughtstream"))
+
+par(mfrow=c(1,2))
+plotThoughtstreamSensitivityAnalysis(thoughtstreamData, 0.5, "thoughtstream")
+plotThoughtstreamSensitivityAnalysis(localUserThoughtstreamData, 0.5, "localUserThoughtstream")
+
+plotThoughtstreamSensitivityAnalysis(thoughtstreamData, 0.9, "thoughtstream")
+plotThoughtstreamSensitivityAnalysis(localUserThoughtstreamData, 0.9, "localUserThoughtstream")
+
+plotThoughtstreamSensitivityAnalysis(thoughtstreamData, 0.99, "thoughtstream")
+plotThoughtstreamSensitivityAnalysis(localUserThoughtstreamData, 0.99, "localUserThoughtstream")
+
+# figure out how to plot the cdf of the latency
+colnames(thoughtstreamData)
+cdf = ecdf(thoughtstreamData$elapsedTime)
+cdfSeq = seq(min(thoughtstreamData$elapsedTime), quantile(thoughtstreamData$elapsedTime, 0.999))
+plot(cdfSeq, cdf(cdfSeq), col=0, xlab="Latency (ms)", ylab="Quantile", main="thoughtstream")
+lines(cdfSeq, cdf(cdfSeq), col="black", lw=2)
+
+basePath = "~/Desktop/thoughtstream"
+setwd(basePath)
+files = list.files(basePath)
+numFiles = length(files)
+colors = rainbow(numFiles)
+
+cdf = ecdf(thoughtstreamData$elapsedTime)
+cdfSeq = seq(min(thoughtstreamData$elapsedTime), quantile(thoughtstreamData$elapsedTime, 0.999))
+plot(cdfSeq, cdf(cdfSeq), col=0, xlab="Latency (ms)", ylab="Quantile", main="thoughtstream")
+
+for (i in 1:numFiles) {
+	print(i)
+	miniThoughtstreamData = convertTimesFromNanosecondsToMilliseconds(as.data.frame(read.csv(files[i])))
+	cdf = ecdf(miniThoughtstreamData$elapsedTime)
+	lines(cdfSeq, cdf(cdfSeq), col=colors[i], lw=2)
+}
