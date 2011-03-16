@@ -72,13 +72,16 @@ getLatencySensitivityAnalysisMatrix = function(queryData, quantile) {
 
 
 # for merging results from several trace collectors into a single matrix
-getSingleDataset = function(basePath, numTraceCollectors) {
+getSingleDataset = function(basePath) {
+	setwd(basePath)
+	files = list.files(basePath)
+	
 	print(1)
-	data = as.data.frame(read.csv(file=paste(basePath, "1.csv", sep="")))
-
-	for (i in 2:numTraceCollectors) {
+	data = as.data.frame(read.csv(files[1]))
+	
+	for (i in 2:length(files)) {
 		print(i)
-		newdata = as.data.frame(read.csv(file=paste(basePath, i, ".csv", sep="")))
+		newdata = as.data.frame(read.csv(file=files[i]))
 		data = rbind(data, newdata)
 	}
 	
