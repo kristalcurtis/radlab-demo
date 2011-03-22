@@ -426,3 +426,55 @@ for (i in 1:numFiles) {
 	cdf = ecdf(miniThoughtstreamData$elapsedTime)
 	lines(cdfSeq, cdf(cdfSeq), col=colors[i], lw=2)
 }
+
+par(mfrow=c(1,2))
+getLatencyCdfPerServer("~/Desktop/thoughtstream", "thoughtstream")
+getLatencyCdfPerServer("~/Desktop/localUserThoughtstream", "localUserThoughtstream")
+
+# 3.21.11
+# thoughtstream data
+
+thoughtstreamQuantileData = as.data.frame(read.csv("~/Desktop/thoughtstreamData.csv"))
+dim(thoughtstreamQuantileData)
+
+colnames(thoughtstreamQuantileData)
+
+numSubsVals = sort(unique(thoughtstreamQuantileData$numSubs))
+numPerPageVals = sort(unique(thoughtstreamQuantileData$numPerPage))
+
+quantileMatrix = matrix(nrow=length(numSubsVals), ncol=length(numPerPageVals))
+rownames(quantileMatrix) = numSubsVals
+colnames(quantileMatrix) = numPerPageVals
+
+for (i in 1:length(numSubsVals)) {
+	for (j in 1:length(numPerPageVals)) {
+		vals = thoughtstreamQuantileData[thoughtstreamQuantileData$numSubs == numSubsVals[i],]
+		quantileMatrix[i,j] = vals$latency[vals$numPerPage == numPerPageVals[j]]
+	}
+}
+
+numSubs = 300
+numPerPage = 20
+
+numColors=10
+heatmap(quantileMatrix, xlab="numPerPage", ylab="numSubscriptions", Rowv=NA, Colv=NA, scale="none", col=brewer.pal(numColors,"RdYlGn")[numColors:1], main="90th Percentile Latency for thoughtstream")
+
+
+library("RColorBrewer")
+brewer.pal(11, "RdYlGn")[11:1]
+display.brewer.pal(11, "RdYlGn")
+display.brewer.all(11, type="div")
+
+library(gplots)
+
+pdf("~/Desktop/thoughtstreamLatencyPlot.pdf", height=10, width=10)
+heatmap.2(quantileMatrix, xlab="numPerPage", ylab="numSubscriptions", Rowv=NA, Colv=NA, scale="none", col=brewer.pal(numColors,"RdYlGn")[numColors:1], main="90th %ile Latency for thoughtstream (ms)", trace="none", cellnote=quantileMatrix)
+dev.off()
+
+usersFollowedByQuantileData = as.data.frame(read.csv("~/Desktop/usersFollowedBy.csv"))
+
+pdf("~/Desktop/usersFollowedBy.pdf")
+plot(usersFollowedByQuantileData$numPerPage, usersFollowedByQuantileData$latency, xlab="num per page", ylab="Latency (ms)", main="90th percentile latency for usersFollowedBy", ylim=c(0,400))
+dev.off()
+
+cor(usersFollowedByQuantileData$numPerPage, usersFollowedByQuantileData$latency)
