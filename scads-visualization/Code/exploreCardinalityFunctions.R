@@ -99,7 +99,7 @@ getLatencyCdfPerServer = function(basePath, queryType) {
 
 	cdf = ecdf(allQueryData$elapsedTime)
 	cdfSeq = seq(min(allQueryData$elapsedTime), quantile(allQueryData$elapsedTime, 0.999))
-	plot(cdfSeq, cdf(cdfSeq), col=0, xlab="Latency (ms)", ylab="Quantile", main="thoughtstream")
+	plot(cdfSeq, cdf(cdfSeq), col=0, xlab="Latency (ms)", ylab="Quantile", main=queryType)
 
 	for (i in 1:numFiles) {
 		print(i)
@@ -108,3 +108,4 @@ getLatencyCdfPerServer = function(basePath, queryType) {
 		lines(cdfSeq, cdf(cdfSeq), col=colors[i], lw=2)
 	}
 }
+
