@@ -434,7 +434,7 @@ getLatencyCdfPerServer("~/Desktop/localUserThoughtstream", "localUserThoughtstre
 # 3.21.11
 # thoughtstream data
 
-thoughtstreamQuantileData = as.data.frame(read.csv("~/Desktop/thoughtstreamData.csv"))
+thoughtstreamQuantileData = as.data.frame(read.csv("~/Desktop/thoughtstream.csv"))
 dim(thoughtstreamQuantileData)
 
 colnames(thoughtstreamQuantileData)
@@ -442,14 +442,14 @@ colnames(thoughtstreamQuantileData)
 numSubsVals = sort(unique(thoughtstreamQuantileData$numSubs))
 numPerPageVals = sort(unique(thoughtstreamQuantileData$numPerPage))
 
-quantileMatrix = matrix(nrow=length(numSubsVals), ncol=length(numPerPageVals))
-rownames(quantileMatrix) = numSubsVals
-colnames(quantileMatrix) = numPerPageVals
+thoughtstreamQuantileMatrix = matrix(nrow=length(numSubsVals), ncol=length(numPerPageVals))
+rownames(thoughtstreamQuantileMatrix) = numSubsVals
+colnames(thoughtstreamQuantileMatrix) = numPerPageVals
 
 for (i in 1:length(numSubsVals)) {
 	for (j in 1:length(numPerPageVals)) {
 		vals = thoughtstreamQuantileData[thoughtstreamQuantileData$numSubs == numSubsVals[i],]
-		quantileMatrix[i,j] = vals$latency[vals$numPerPage == numPerPageVals[j]]
+		thoughtstreamQuantileMatrix[i,j] = vals$latency[vals$numPerPage == numPerPageVals[j]]
 	}
 }
 
@@ -457,7 +457,7 @@ numSubs = 300
 numPerPage = 20
 
 numColors=10
-heatmap(quantileMatrix, xlab="numPerPage", ylab="numSubscriptions", Rowv=NA, Colv=NA, scale="none", col=brewer.pal(numColors,"RdYlGn")[numColors:1], main="90th Percentile Latency for thoughtstream")
+heatmap(thoughtstreamQuantileMatrix, xlab="numPerPage", ylab="numSubscriptions", Rowv=NA, Colv=NA, scale="none", col=brewer.pal(numColors,"RdYlGn")[numColors:1], main="90th Percentile Latency for thoughtstream")
 
 
 library("RColorBrewer")
@@ -468,7 +468,7 @@ display.brewer.all(11, type="div")
 library(gplots)
 
 pdf("~/Desktop/thoughtstreamLatencyPlot.pdf", height=10, width=10)
-heatmap.2(quantileMatrix, xlab="numPerPage", ylab="numSubscriptions", Rowv=NA, Colv=NA, scale="none", col=brewer.pal(numColors,"RdYlGn")[numColors:1], main="90th %ile Latency for thoughtstream (ms)", trace="none", cellnote=quantileMatrix)
+heatmap.2(thoughtstreamQuantileMatrix, xlab="numPerPage", ylab="numSubscriptions", Rowv=NA, Colv=NA, scale="none", col=brewer.pal(numColors,"RdYlGn")[numColors:1], main="99th %ile Latency for thoughtstream (ms)", trace="none", cellnote=thoughtstreamQuantileMatrix)
 dev.off()
 
 usersFollowedByQuantileData = as.data.frame(read.csv("~/Desktop/usersFollowedBy.csv"))
@@ -478,3 +478,90 @@ plot(usersFollowedByQuantileData$numPerPage, usersFollowedByQuantileData$latency
 dev.off()
 
 cor(usersFollowedByQuantileData$numPerPage, usersFollowedByQuantileData$latency)
+
+
+# index merge join benchmark
+
+joinQuantileData = as.data.frame(read.csv("~/Desktop/indexMergeJoin.csv"))
+dim(joinQuantileData)
+
+colnames(joinQuantileData)
+
+numSubsVals = sort(unique(joinQuantileData$numSubs))
+numPerPageVals = sort(unique(joinQuantileData$numPerPage))
+
+indexMergeJoinQuantileMatrix = matrix(nrow=length(numSubsVals), ncol=length(numPerPageVals))
+rownames(indexMergeJoinQuantileMatrix) = numSubsVals
+colnames(indexMergeJoinQuantileMatrix) = numPerPageVals
+
+for (i in 1:length(numSubsVals)) {
+	for (j in 1:length(numPerPageVals)) {
+		vals = joinQuantileData[joinQuantileData$numSubs == numSubsVals[i],]
+		indexMergeJoinQuantileMatrix[i,j] = vals$latency[vals$numPerPage == numPerPageVals[j]]
+	}
+}
+
+pdf("~/Desktop/indexMergeJoinLatencyPlot.pdf", height=10, width=10)
+heatmap.2(indexMergeJoinQuantileMatrix, xlab="numPerPage", ylab="numSubscriptions", Rowv=NA, Colv=NA, scale="none", col=brewer.pal(numColors,"RdYlGn")[numColors:1], main="99th %ile Latency for indexMergeJoin (ms)", trace="none", cellnote=indexMergeJoinQuantileMatrix)
+dev.off()
+
+
+# looking at stddev for thoughtstream
+
+thoughtstreamStddevData = as.data.frame(read.csv("~/Desktop/thoughtstreamStddev.csv"))
+dim(thoughtstreamStddevData)
+
+colnames(thoughtstreamStddevData)
+
+numSubsVals = sort(unique(thoughtstreamStddevData$numSubs))
+numPerPageVals = sort(unique(thoughtstreamStddevData$numPerPage))
+
+thoughtstreamStddevMatrix = matrix(nrow=length(numSubsVals), ncol=length(numPerPageVals))
+rownames(thoughtstreamStddevMatrix) = numSubsVals
+colnames(thoughtstreamStddevMatrix) = numPerPageVals
+
+for (i in 1:length(numSubsVals)) {
+	for (j in 1:length(numPerPageVals)) {
+		vals = thoughtstreamStddevData[thoughtstreamStddevData$numSubs == numSubsVals[i],]
+		thoughtstreamStddevMatrix[i,j] = round(vals$latencyStddev[vals$numPerPage == numPerPageVals[j]])
+	}
+}
+
+pdf("~/Desktop/thoughtstreamStddevPlot.pdf", height=10, width=10)
+heatmap.2(thoughtstreamStddevMatrix, xlab="numPerPage", ylab="numSubscriptions", Rowv=NA, Colv=NA, scale="none", col=brewer.pal(numColors,"RdYlGn")[numColors:1], main="Stddev for thoughtstream data", trace="none", cellnote=thoughtstreamStddevMatrix)
+dev.off()
+
+
+# looking at median 99th percentile latency for thoughtstream
+thoughtstreamMedian99thData = as.data.frame(read.csv("~/Desktop/thoughtstreamMedian99th.csv"))
+dim(thoughtstreamMedian99thData)
+
+colnames(thoughtstreamMedian99thData)[4]
+
+numSubsVals = sort(unique(thoughtstreamMedian99thData$numSubs))
+numPerPageVals = sort(unique(thoughtstreamMedian99thData$numPerPage))
+
+thoughtstreamMedian99thMatrix = matrix(nrow=length(numSubsVals), ncol=length(numPerPageVals))
+rownames(thoughtstreamMedian99thMatrix) = numSubsVals
+colnames(thoughtstreamMedian99thMatrix) = numPerPageVals
+
+for (i in 1:length(numSubsVals)) {
+	for (j in 1:length(numPerPageVals)) {
+		vals = thoughtstreamMedian99thData[thoughtstreamMedian99thData$numSubs == numSubsVals[i],]
+		thoughtstreamMedian99thMatrix[i,j] = round(vals$latencyMedian99th[vals$numPerPage == numPerPageVals[j]])
+	}
+}
+
+pdf("~/Desktop/thoughtstreamMedian99thPlot.pdf", height=10, width=10)
+heatmap.2(thoughtstreamMedian99thMatrix, xlab="numPerPage", ylab="numSubscriptions", Rowv=NA, Colv=NA, scale="none", col=brewer.pal(numColors,"RdYlGn")[numColors:1], main="Median 99th %ile latency, thoughtstream", trace="none", cellnote=thoughtstreamMedian99thMatrix)
+dev.off()
+
+# trying out new function for creating matrix
+setwd("/Users/kcurtis/workspace/radlab-demo/scads-visualization/Code")
+source("visualization-functions.R")
+source("exploreCardinalityFunctions.R")
+
+mtx = getLatencyMetricMatrix("~/Desktop/thoughtstreamMedian99th.csv")
+pdf("~/Desktop/thoughtstreamMedian99thPlot.pdf", height=10, width=10)
+plotLatencyMetricHeatmap(mtx, "thoughtstream: Median 99th %ile latency")
+dev.off()
