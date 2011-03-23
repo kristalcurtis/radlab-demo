@@ -109,3 +109,27 @@ getLatencyCdfPerServer = function(basePath, queryType) {
 	}
 }
 
+getLatencyMetricMatrix = function(filename) {
+	latencyMetricData = as.data.frame(read.csv(filename))
+	latencyColname = colnames(latencyMetricData)[4]
+
+	numSubsVals = sort(unique(latencyMetricData$numSubs))
+	numPerPageVals = sort(unique(latencyMetricData$numPerPage))
+
+	latencyMetricMatrix = matrix(nrow=length(numSubsVals), ncol=length(numPerPageVals))
+	rownames(latencyMetricMatrix) = numSubsVals
+	colnames(latencyMetricMatrix) = numPerPageVals
+
+	for (i in 1:length(numSubsVals)) {
+		for (j in 1:length(numPerPageVals)) {
+			vals = latencyMetricData[latencyMetricData$numSubs == numSubsVals[i],]
+			latencyMetricMatrix[i,j] = round(vals[vals$numPerPage == numPerPageVals[j], latencyColname])
+		}
+	}
+
+	latencyMetricMatrix
+}
+
+plotLatencyMetricHeatmap = function(mtx, main) {
+	heatmap.2(mtx, xlab="numPerPage", ylab="numSubscriptions", Rowv=NA, Colv=NA, scale="none", col=brewer.pal(numColors,"RdYlGn")[numColors:1], main=main, trace="none", cellnote=mtx)
+}
